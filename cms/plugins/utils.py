@@ -34,7 +34,7 @@ def assign_plugins(request, placeholders, lang=None):
     request_lang = lang
     if hasattr(request, "current_page") and request.current_page is not None:
         languages = request.current_page.get_languages()
-        if not lang in languages and not get_redirect_on_fallback(lang):
+        if lang not in languages and not get_redirect_on_fallback(lang):
             fallbacks = get_fallback_languages(lang)
             for fallback in fallbacks:
                 if fallback in languages:
@@ -46,7 +46,13 @@ def assign_plugins(request, placeholders, lang=None):
     plugin_list = downcast_plugins(qs)
 
     # split the plugins up by placeholder
-    groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))
+    groups = {
+        key: list(plugins)
+        for key, plugins in groupby(
+            plugin_list, operator.attrgetter('placeholder_id')
+        )
+    }
+
 
     for group in groups:
         groups[group] = build_plugin_tree(groups[group])
@@ -91,8 +97,7 @@ def downcast_plugins(queryset, select_placeholder=False):
         for instance in plugin_qs:
             plugin_lookup[instance.pk] = instance
             # make the equivalent list of qs, but with downcasted instances
-    plugin_list = [plugin_lookup[p.pk] for p in queryset if p.pk in plugin_lookup]
-    return plugin_list
+    return [plugin_lookup[p.pk] for p in queryset if p.pk in plugin_lookup]
 
 
 def get_plugins_for_page(request, page, lang=None):

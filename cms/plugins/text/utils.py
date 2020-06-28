@@ -85,4 +85,4 @@ def replace_plugin_tags(text, id_dict):
 def _plugin_dict(text, regex=OBJ_ADMIN_RE):
     plugin_ids = plugin_tags_to_id_list(text, regex)
     plugin_list = downcast_plugins(CMSPlugin.objects.filter(pk__in=plugin_ids), select_placeholder=True)
-    return dict((plugin.pk, plugin) for plugin in plugin_list)
+    return {plugin.pk: plugin for plugin in plugin_list}

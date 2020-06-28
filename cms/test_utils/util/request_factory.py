@@ -89,10 +89,7 @@ class RequestFactory(object):
         else:
             # Encode the content so that the byte representation is correct.
             match = CONTENT_TYPE_RE.match(content_type)
-            if match:
-                charset = match.group(1)
-            else:
-                charset = settings.DEFAULT_CHARSET
+            charset = match.group(1) if match else settings.DEFAULT_CHARSET
             post_data = smart_str(data, encoding=charset)
 
         parsed = urlparse(path)

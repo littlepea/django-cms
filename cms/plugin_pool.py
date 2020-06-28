@@ -67,10 +67,7 @@ class PluginPool(object):
         plugins = self.plugins.values()[:]
         plugins.sort(key=lambda obj: unicode(obj.name))
         final_plugins = []
-        if page:
-            template = page.get_template()
-        else:
-            template = None
+        template = page.get_template() if page else None
         allowed_plugins = get_placeholder_conf(
             setting_key,
             placeholder,
@@ -88,7 +85,7 @@ class PluginPool(object):
                 include_plugin = False
             if include_plugin:
                 final_plugins.append(plugin)
-                
+
         if final_plugins:
             plugins = final_plugins
 
@@ -101,9 +98,8 @@ class PluginPool(object):
         plugins +=self.get_all_plugins(placeholder, page, 'text_only_plugins')
         final = []
         for plugin in plugins:
-            if plugin.text_enabled:
-                if plugin not in final:
-                    final.append(plugin)
+            if plugin.text_enabled and plugin not in final:
+                final.append(plugin)
         return final
 
     def get_plugin(self, name):

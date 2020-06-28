@@ -100,7 +100,7 @@ class MenuPool(object):
     def register_modifier(self, modifier_class):
         from menus.base import Modifier
         assert issubclass(modifier_class, Modifier)
-        if not modifier_class in self.modifiers:
+        if modifier_class not in self.modifiers:
             self.modifiers.append(modifier_class)
 
     def _build_nodes(self, request, site_id):
@@ -182,17 +182,13 @@ class MenuPool(object):
 
     def get_menus_by_attribute(self, name, value):
         self.discover_menus()
-        found = []
-        for menu in self.menus.items():
-            if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
-                found.append((menu[0], menu[1].name))
-        return found
+        return [
+            (menu[0], menu[1].name)
+            for menu in self.menus.items()
+            if hasattr(menu[1], name) and getattr(menu[1], name, None) == value
+        ]
 
     def get_nodes_by_attribute(self, nodes, name, value):
-        found = []
-        for node in nodes:
-            if node.attr.get(name, None) == value:
-                found.append(node)
-        return found
+        return [node for node in nodes if node.attr.get(name, None) == value]
 
 menu_pool = MenuPool()

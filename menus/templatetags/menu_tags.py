@@ -43,9 +43,8 @@ def cut_after(node, levels, removed):
 
 def remove(node, removed):
     removed.append(node)
-    if node.parent:
-        if node in node.parent.children:
-            node.parent.children.remove(node)
+    if node.parent and node in node.parent.children:
+        node.parent.children.remove(node)
 
 
 def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
@@ -64,7 +63,7 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             # turn nodes that are on from_level into root nodes
             final.append(node)
             node.parent = None
-        if not node.ancestor and not node.selected and not node.descendant:
+        if not (node.ancestor or node.selected or node.descendant):
             # cut inactive nodes to extra_inactive, but not of descendants of 
             # the selected node
             cut_after(node, extra_inactive, removed)
@@ -292,13 +291,10 @@ class ShowBreadcrumb(InclusionTag):
                 if node.visible or not only_visible:
                     ancestors.append(node)
                 node = node.parent
-        if not ancestors or (ancestors and ancestors[-1] != home) and home:
+        if not ancestors or ancestors[-1] != home and home:
             ancestors.append(home)
         ancestors.reverse()
-        if len(ancestors) >= start_level:
-            ancestors = ancestors[start_level:]
-        else:
-            ancestors = []
+        ancestors = ancestors[start_level:] if len(ancestors) >= start_level else []
         context.update({'ancestors': ancestors,
             'template': template})
         return context
@@ -348,10 +344,7 @@ class LanguageChooser(InclusionTag):
     def get_context(self, context, template, i18n_mode):
         if template in MARKERS:
             _tmp = template
-            if i18n_mode not in MARKERS:
-                template = i18n_mode
-            else:
-                template = NOT_PROVIDED
+            template = i18n_mode if i18n_mode not in MARKERS else NOT_PROVIDED
             i18n_mode = _tmp
         if template is NOT_PROVIDED:
             template = "menu/language_chooser.html"
@@ -364,10 +357,12 @@ class LanguageChooser(InclusionTag):
         current_lang = get_language()
         site = Site.objects.get_current()
         user_is_staff = context['request'].user.is_staff
-        languages = []
-        for lang in get_language_objects(site.pk):
-            if user_is_staff or lang.get('public', True):
-                languages.append((lang['code'], marker(lang['name'], lang['code'])))
+        languages = [
+            (lang['code'], marker(lang['name'], lang['code']))
+            for lang in get_language_objects(site.pk)
+            if user_is_staff or lang.get('public', True)
+        ]
+
         context.update({
             'languages': languages,
             'current_language': current_lang,

@@ -21,10 +21,7 @@ class PageSelectWidget(MultiWidget):
     a page on that site in a two step process.
     """
     def __init__(self, site_choices=None, page_choices=None, attrs=None):
-        if attrs is not None:
-            self.attrs = attrs.copy()
-        else:
-            self.attrs = {}
+        self.attrs = attrs.copy() if attrs is not None else {}
         if site_choices is None or page_choices is None:
             site_choices, page_choices = get_site_choices(), get_page_choices()
         self.site_choices = site_choices
@@ -50,7 +47,7 @@ class PageSelectWidget(MultiWidget):
     def _has_changed(self, initial, data):
         # THIS IS A COPY OF django.forms.widgets.Widget._has_changed()
         # (except for the first if statement)
-        
+
         """
         Return True if data differs from initial.
         """
@@ -61,13 +58,8 @@ class PageSelectWidget(MultiWidget):
             data_value = u''
         else:
             data_value = data
-        if initial is None:
-            initial_value = u''
-        else:
-            initial_value = initial
-        if force_unicode(initial_value) != force_unicode(data_value):
-            return True
-        return False
+        initial_value = u'' if initial is None else initial
+        return force_unicode(initial_value) != force_unicode(data_value)
     
     def render(self, name, value, attrs=None):
         # THIS IS A COPY OF django.forms.widgets.MultiWidget.render()
@@ -126,10 +118,7 @@ class PageSelectWidget(MultiWidget):
     
 class PluginEditor(Widget):
     def __init__(self, attrs=None):
-        if attrs is not None:
-            self.attrs = attrs.copy()
-        else:
-            self.attrs = {}
+        self.attrs = attrs.copy() if attrs is not None else {}
         
     class Media:
         js = [cms_static_url(path) for path in (

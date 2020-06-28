@@ -322,10 +322,9 @@ class RenderingTestCase(SettingsOverrideTestCase):
 
     def test_placeholder_name_toolbar(self):
         placeholder_conf_name = 'test_placeholder'
-        placeholder_conf_tag = '<div class="cms_placeholder-title">%s</div>' % placeholder_conf_name
         with SettingsOverride(CMS_PLACEHOLDER_CONF = {
-                                  'test': {'name':placeholder_conf_name}
-                              }):
+                                      'test': {'name':placeholder_conf_name}
+                                  }):
             placeholder = Placeholder()
             placeholder.slot = 'test'
             placeholder.pk = placeholder.id = 99
@@ -344,4 +343,5 @@ class RenderingTestCase(SettingsOverrideTestCase):
                 "cms_placeholder_slot::test",
                 ]
             output = render_placeholder_toolbar(placeholder, context, '', 'test')
+            placeholder_conf_tag = '<div class="cms_placeholder-title">%s</div>' % placeholder_conf_name
             self.assertTrue(placeholder_conf_tag in output, 'placeholder name %r is not in %r' % (placeholder_conf_name, output))

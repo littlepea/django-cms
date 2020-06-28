@@ -142,7 +142,7 @@ class PageAddForm(forms.ModelForm):
     
     def clean_language(self):
         language = self.cleaned_data['language']
-        if not language in get_language_list():
+        if language not in get_language_list():
             raise ValidationError("Given language does not match language settings.")
         return language
         
@@ -177,9 +177,15 @@ class PageForm(PageAddForm):
         if 'reverse_id' in self.fields:
             id = cleaned_data['reverse_id']
             site_id = cleaned_data['site']
-            if id:
-                if Page.objects.filter(reverse_id=id, site=site_id, publisher_is_draft=True).exclude(pk=self.instance.pk).count():
-                    self._errors['reverse_id'] = self.error_class([_('A page with this reverse URL id exists already.')])
+            if (
+                id
+                and Page.objects.filter(
+                    reverse_id=id, site=site_id, publisher_is_draft=True
+                )
+                .exclude(pk=self.instance.pk)
+                .count()
+            ):
+                self._errors['reverse_id'] = self.error_class([_('A page with this reverse URL id exists already.')])
         return cleaned_data
 
     def clean_overwrite_url(self):
@@ -303,7 +309,7 @@ class GlobalPagePermissionAdminForm(forms.ModelForm):
 
     def clean(self):
         super(GlobalPagePermissionAdminForm, self).clean()
-        if not self.cleaned_data['user'] and not self.cleaned_data['group']:
+        if not (self.cleaned_data['user'] or self.cleaned_data['group']):
             raise forms.ValidationError(_('Please select user or group first.'))
         return self.cleaned_data
 

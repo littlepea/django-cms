@@ -26,7 +26,7 @@ def get_template_from_request(request, obj=None, no_current_page=False):
         return get_cms_setting('TEMPLATES')[0][0]
     if "template" in request.REQUEST:
         template = request.REQUEST['template']
-    if not template and obj is not None:
+    if not (template or obj is None):
         template = obj.get_template()
     if not template and not no_current_page and hasattr(request, "current_page"):
         current_page = request.current_page
@@ -37,7 +37,7 @@ def get_template_from_request(request, obj=None, no_current_page=False):
             # Happens on admin's request when changing the template for a page
             # to "inherit".
             return obj.get_template()
-        return template    
+        return template
     return get_cms_setting('TEMPLATES')[0][0]
 
 
@@ -49,13 +49,12 @@ def get_language_from_request(request, current_page=None):
     site_id = current_page.site_id if current_page else None
     if language:
         language = get_language_code(language)
-        if not language in get_language_list(site_id):
+        if language not in get_language_list(site_id):
             language = None
     if language is None:
         language = get_language_code(getattr(request, 'LANGUAGE_CODE', None))
-    if language:
-        if not language in get_language_list(site_id):
-            language = None
+    if language and language not in get_language_list(site_id):
+        language = None
 
     if language is None and current_page:
         # in last resort, get the first language available in the page

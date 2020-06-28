@@ -104,8 +104,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         response = self.client.post(edit_url, data)
         self.assertEquals(response.status_code, 200)
-        txt = Text.objects.get(pk=plugin_id)
-        return txt
+        return Text.objects.get(pk=plugin_id)
 
     def test_add_edit_plugin(self):
         """
@@ -561,7 +560,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         with self.assertNumQueries(2):
             rendered = text_plugin.render_plugin(placeholder=ph)
-        for i in range(0, 10):
+        for i in range(10):
             self.assertTrue('A Link %d' % i in rendered)
 
     def test_copy_textplugin(self):

@@ -133,12 +133,15 @@ class CMSPluginBase(admin.ModelAdmin):
         """
         We just need the popup interface here
         """
-        context.update({
-            'preview': not "no_preview" in request.GET,
-            'is_popup': True,
-            'plugin': self.cms_plugin_instance,
-            'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-        })
+        context.update(
+            {
+                'preview': "no_preview" not in request.GET,
+                'is_popup': True,
+                'plugin': self.cms_plugin_instance,
+                'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
+            }
+        )
+
 
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
 

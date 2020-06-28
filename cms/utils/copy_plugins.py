@@ -6,10 +6,7 @@ def copy_plugins_to(plugin_list, to_placeholder, to_language = None):
     ptree = []
     plugins_ziplist = []
     for old_plugin in plugin_list:
-        if to_language:
-            plugin_language = to_language
-        else:
-            plugin_language = old_plugin.language
+        plugin_language = to_language if to_language else old_plugin.language
         # do the simple copying
         new_plugin = old_plugin.copy_plugin(to_placeholder, plugin_language, ptree) # note that ptree comes back modified
         plugins_ziplist.append((new_plugin, old_plugin))

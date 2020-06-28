@@ -16,11 +16,11 @@ class NavextendersFixture(object):
             page4
                 page5
         """
-        defaults = {
-            'template': 'nav_playground.html',
-            'language': 'en',            
-        }
         with SettingsOverride(CMS_PERMISSION=False):
+            defaults = {
+                'template': 'nav_playground.html',
+                'language': 'en',            
+            }
             p1 = create_page('page1', published=True, in_navigation=True, **defaults)
             p4 = create_page('page4', published=True, in_navigation=True, **defaults)
             p1 = Page.objects.get(pk=p1.pk)

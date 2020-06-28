@@ -224,9 +224,9 @@ def check_plugin_instances(output):
 
 @define_check
 def check_copy_relations(output):
-    c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
     with output.section('Presence of "copy_relations"') as section:
         plugin_pool.discover_plugins()
+        c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
         for plugin in plugin_pool.plugins.values():
             plugin_class = plugin.model
             if 'copy_relations' in plugin_class.__dict__:

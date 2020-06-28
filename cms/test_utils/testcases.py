@@ -214,8 +214,9 @@ class CMSTestCase(testcases.TestCase):
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
 
-        copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
-        return copied_page
+        return self.assertObjectExist(
+            Page.objects, title_set__slug=copied_slug, parent=target_page
+        )
 
     def move_page(self, page, target_page, position="first-child"):
         page.move_page(target_page, position)

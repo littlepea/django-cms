@@ -77,9 +77,9 @@ class NonRootCase(CMSTestCase):
         """
         Tests for correct form URL mangling in preview_link templatetag
         """
-        language = 'en'
         with force_language("en"):
             pages_root = self.get_pages_root()
+            language = 'en'
             link = preview_link(self.page2,language=language)
         self.assertEqual(link,'%s%s/' % (pages_root,self.page2.get_slug()))
         self.assertEqual(link,'/en/content/page2/')

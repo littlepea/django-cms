@@ -30,8 +30,7 @@ def plugin_report():
     plugin_types.sort()
 
     for plugin_type in plugin_types: 
-        plugin = {}
-        plugin["type"] = plugin_type
+        plugin = {"type": plugin_type}
         try:
             # get all plugins of this type                 
             plugins = CMSPlugin.objects.filter(plugin_type=plugin_type)
@@ -40,7 +39,7 @@ def plugin_report():
             plugin["model"] = plugin_pool.get_plugin(name=plugin_type).model
             unsaved_instances = [p for p in plugins if not p.get_plugin_instance()[0]]
             plugin["unsaved_instances"] = unsaved_instances
-               
+
         # catch uninstalled plugins
         except KeyError:
             plugin["model"] = None
@@ -48,7 +47,7 @@ def plugin_report():
             plugin["unsaved_instances"] = []
 
         plugin_report.append(plugin)
-        
+
     return plugin_report
 
     

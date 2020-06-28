@@ -10,9 +10,8 @@ def save_all_plugins(request, page, placeholder, excludes=None):
         raise Http404
 
     for plugin in CMSPlugin.objects.filter(placeholder=placeholder):
-        if excludes:
-            if plugin.pk in excludes:
-                continue
+        if excludes and plugin.pk in excludes:
+            continue
         instance, admin = plugin.get_plugin_instance()
         if instance:
             instance.save()

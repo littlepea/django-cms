@@ -248,7 +248,7 @@ class Placeholder(Tag):
                     "The width parameter for the placeholder tag is deprecated.",
                     DeprecationWarning
                 )
-        if not 'request' in context:
+        if 'request' not in context:
             return ''
         request = context['request']
         if width:
@@ -356,7 +356,7 @@ class PageAttribute(AsTag):
     ]
 
     def get_value(self, context, name, page_lookup):
-        if not 'request' in context:
+        if 'request' not in context:
             return ''
         name = name.lower()
         request = context['request']

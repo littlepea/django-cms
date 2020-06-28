@@ -84,9 +84,7 @@ class CMSChangeList(ChangeList):
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR):
             if i in lookup_params:
                 del lookup_params[i]
-        if not lookup_params.items() and not self.query:
-            return False
-        return True
+        return bool(lookup_params.items() or self.query)
     
     def get_results(self, request):
         if self.real_queryset:

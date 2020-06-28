@@ -114,12 +114,13 @@ class CMSPlugin(MPTTModel):
         # and as a result, the super call will cause an infinite recursion.
         # See #10547 and #12121.
         defers = []
-        pk_val = None
         if self._deferred:
             factory = deferred_class_factory
+            pk_val = None
             for field in self._meta.fields:
-                if isinstance(self.__class__.__dict__.get(field.attname),
-                        DeferredAttribute):
+                if isinstance(
+                    model.__dict__.get(field.attname), DeferredAttribute
+                ):
                     defers.append(field.attname)
                     if pk_val is None:
                         # The pk_val and model values are the same for all
@@ -164,7 +165,7 @@ class CMSPlugin(MPTTModel):
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         instance, plugin = self.get_plugin_instance()
-        if instance and not (admin and not plugin.admin_preview):
+        if instance and (not admin or plugin.admin_preview):
             if not isinstance(placeholder, Placeholder):
                 placeholder = instance.placeholder
             placeholder_slot = placeholder.slot

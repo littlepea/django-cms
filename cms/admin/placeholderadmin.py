@@ -76,7 +76,19 @@ class PlaceholderAdmin(ModelAdmin):
                 },))
             return fieldsets
         fieldsets = []
-        fieldsets.append((None, {'fields': [f for f in form.base_fields.keys() if not f in placeholder_fields]}))
+        fieldsets.append(
+            (
+                None,
+                {
+                    'fields': [
+                        f
+                        for f in form.base_fields.keys()
+                        if f not in placeholder_fields
+                    ]
+                },
+            )
+        )
+
         for placeholder in placeholder_fields:
             fieldsets.append((self.get_label_for_placeholder(placeholder), {
                 'fields': (placeholder,),
@@ -130,19 +142,19 @@ class PlaceholderAdmin(ModelAdmin):
     def language_tab_context(self, request):
         language = self.get_language_from_request(request)
         languages = [(lang, lang_name) for lang, lang_name in settings.LANGUAGES]
-        context = {
+        return {
             'language': language,
             'language_tabs': languages,
-            'show_language_tabs': len(languages) > 1 and self.render_placeholder_language_tabs,
+            'show_language_tabs': len(languages) > 1
+            and self.render_placeholder_language_tabs,
         }
-        return context
 
     def _get_placeholder_fields(self, form):
-        placeholder_fields = []
-        for key, value in form.base_fields.items():
-            if isinstance(value, PlaceholderFormField):
-                placeholder_fields.append(key)
-        return placeholder_fields
+        return [
+            key
+            for key, value in form.base_fields.items()
+            if isinstance(value, PlaceholderFormField)
+        ]
 
     def get_urls(self):
         """

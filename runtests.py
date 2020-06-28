@@ -12,7 +12,6 @@ import os
 
 def main(db_url="sqlite://localhost/:memory:", test_runner='cms.test_utils.runners.NormalTestRunner', junit_output_dir='.',
          time_tests=False, verbosity=1, failfast=False, test_labels=None):
-    verbosity = int(verbosity)
     if not test_labels:
         test_labels = ['cms']
     with temp_dir() as STATIC_ROOT:
@@ -28,6 +27,7 @@ def main(db_url="sqlite://localhost/:memory:", test_runner='cms.test_utils.runne
             from django.test.utils import get_runner
             TestRunner = get_runner(settings)
 
+            verbosity = int(verbosity)
             test_runner = TestRunner(verbosity=verbosity, interactive=False, failfast=failfast)
             failures = test_runner.run_tests(test_labels)
     sys.exit(failures)

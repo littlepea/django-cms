@@ -32,9 +32,9 @@ class Title(models.Model):
         return u"%s (%s, %s)" % (self.title, self.slug, self.language)
 
     def update_path(self):
-        # Build path from parent page's path and slug
-        slug = u'%s' % self.slug
         if not self.has_url_overwrite:
+            # Build path from parent page's path and slug
+            slug = u'%s' % self.slug
             self.path = u'%s' % slug
             if self.page.parent_id:
                 parent_page = self.page.parent_id

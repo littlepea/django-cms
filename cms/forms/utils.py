@@ -80,9 +80,11 @@ def get_page_cache_key(lang):
     return _get_key(get_cms_setting('PAGE_CHOICES_CACHE_KEY'), lang)
 
 def _clean_many(prefix):
-    keys = []
-    for lang in [language[0] for language in settings.LANGUAGES]:
-        keys.append(_get_key(prefix, lang))
+    keys = [
+        _get_key(prefix, lang)
+        for lang in [language[0] for language in settings.LANGUAGES]
+    ]
+
     cache.delete_many(keys)
 
 def clean_site_choices_cache(sender, **kwargs):

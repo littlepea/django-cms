@@ -114,8 +114,6 @@ class CMSToolbar(Toolbar):
         # Store access property values to avoid having to recompute them
         is_staff = self.is_staff
         can_change = self.can_change
-        edit_mode = self.edit_mode
-
         if can_change:
             items.append(
                 self.edit_mode_switcher
@@ -124,6 +122,8 @@ class CMSToolbar(Toolbar):
         if is_staff:
 
             current_page = self.request.current_page
+
+            edit_mode = self.edit_mode
 
             if current_page:
                 # publish button

@@ -30,10 +30,7 @@ class Video(CMSPlugin):
     
         
     def __unicode__(self):
-        if self.movie:
-            name = self.movie.path
-        else:
-            name = self.movie_url
+        name = self.movie.path if self.movie else self.movie_url
         return u"%s" % basename(name)
 
     def get_height(self):

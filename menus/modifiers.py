@@ -40,10 +40,7 @@ class Marker(Modifier):
                 if node.children:                    
                     self.mark_descendants(node.children)
                 selected = node
-            if node.children:
-                node.is_leaf_node = False
-            else:
-                node.is_leaf_node = True
+            node.is_leaf_node = False if node.children else True
         return nodes
                 
     def mark_descendants(self, nodes):

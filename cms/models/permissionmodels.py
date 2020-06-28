@@ -61,7 +61,7 @@ class AbstractPagePermission(models.Model):
         return ", ".join([unicode(t) for t in targets]) or 'No one'
 
     def save(self, *args, **kwargs):
-        if not self.user and not self.group:
+        if not (self.user or self.group):
             # don't allow `empty` objects
             return
         return super(AbstractPagePermission, self).save(*args, **kwargs)

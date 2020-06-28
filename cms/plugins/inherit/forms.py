@@ -19,6 +19,6 @@ class InheritForm(ModelForm):
         
     def clean(self):
         cleaned_data = super(InheritForm, self).clean()
-        if not cleaned_data['from_page'] and not cleaned_data['from_language']:
+        if not (cleaned_data['from_page'] or cleaned_data['from_language']):
             self._errors['from_page'] = ErrorList([_("Language or Page must be filled out")])
         return cleaned_data

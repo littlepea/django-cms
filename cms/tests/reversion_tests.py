@@ -171,7 +171,7 @@ class ReversionTestCase(CMSTestCase):
                 page = Page.objects.all()[0]
                 page_pk = page.pk
                 self.assertEquals(Revision.objects.all().count(), 5)
-                for x in xrange(10):
+                for _ in xrange(10):
                     publish_url = URL_CMS_PAGE + "%s/publish/" % page_pk
                     response = self.client.get(publish_url)
                     self.assertEquals(response.status_code, 302)

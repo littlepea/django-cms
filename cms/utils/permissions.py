@@ -251,11 +251,9 @@ def get_subordinate_groups(user):
 def has_global_change_permissions_permission(request):
     opts = GlobalPagePermission._meta
     user = request.user
-    if user.is_superuser or (
+    return bool(user.is_superuser or (
         user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and
-        has_global_page_permission(request, can_change=True)):
-        return True
-    return False
+        has_global_page_permission(request, can_change=True)))
 
 def has_generic_permission(page_id, user, attr, site):
     """

@@ -434,9 +434,10 @@ class PagePermissionsPermissionManager(models.Manager):
         from cms.models import (GlobalPagePermission, PagePermission,
             MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
 
-        if attr != "can_view":
-            if not user.is_authenticated() or not user.is_staff:
-                return []
+        if attr != "can_view" and (
+            not user.is_authenticated() or not user.is_staff
+        ):
+            return []
         if user.is_superuser or not get_cms_setting('PERMISSION'):
             # got superuser, or permissions aren't enabled? just return grant
             # all mark
@@ -464,7 +465,7 @@ class PagePermissionsPermissionManager(models.Manager):
                 # can add is special - we are actually adding page under current page
                 if permission.grant_on & MASK_PAGE or attr is "can_add":
                     page_id_allow_list.append(permission.page.id)
-                if permission.grant_on & MASK_CHILDREN and not attr is "can_add":
+                if permission.grant_on & MASK_CHILDREN and attr is not "can_add":
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:
                     page_id_allow_list.extend(permission.page.get_descendants().values_list('id', flat=True))

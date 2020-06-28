@@ -8,10 +8,7 @@ class BaseInlineFormSetWithQuerySet(BaseInlineFormSet):
     def __init__(self, data=None, files=None, instance=None,
                  save_as_new=False, prefix=None, queryset=None):
         from django.db.models.fields.related import RelatedObject
-        if instance is None:
-            self.instance = self.model()
-        else:
-            self.instance = instance
+        self.instance = self.model() if instance is None else instance
         self.save_as_new = save_as_new
         # is there a better way to get the object descriptor?
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()

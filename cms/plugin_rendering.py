@@ -93,10 +93,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     request = context['request']
     plugins = [plugin for plugin in get_plugins(request, placeholder)]
     page = placeholder.page if placeholder else None
-    if page:
-        template = page.template
-    else:
-        template = None
+    template = page.template if page else None
     # Add extra context as defined in settings, but do not overwrite existing context variables,
     # since settings are general and database/template are specific
     # TODO this should actually happen as a plugin context processor, but these currently overwrite 
@@ -106,7 +103,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if slot:
         extra_context = get_placeholder_conf("extra_context", slot, template, {})
     for key, value in extra_context.items():
-        if not key in context:
+        if key not in context:
             context[key] = value
 
     content = []
@@ -145,10 +142,7 @@ def render_placeholder_toolbar(placeholder, context, content, name_fallback=None
             placeholder.page = page
     else:
         template = None
-    if placeholder:
-        slot = placeholder.slot
-    else:
-        slot = None
+    slot = placeholder.slot if placeholder else None
     installed_plugins = plugin_pool.get_all_plugins(slot, page)
     name = get_placeholder_conf("name", slot, template, title(slot))
     name = _(name)

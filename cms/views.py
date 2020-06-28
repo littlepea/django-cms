@@ -52,13 +52,11 @@ def details(request, slug):
         if 'draft' in request.GET:
             attrs += '&draft=1'
     # Check that the language is in FRONTEND_LANGUAGES:
-    if not current_language in user_languages:
+    if current_language not in user_languages:
         #are we on root?
         if not slug:
             #redirect to supported language
-            languages = []
-            for language in available_languages:
-                languages.append((language, language))
+            languages = [(language, language) for language in available_languages]
             if languages:
                 with SettingsOverride(LANGUAGES=languages, LANGUAGE_CODE=languages[0][0]):
                     #get supported language

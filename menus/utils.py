@@ -16,9 +16,8 @@ def cut_levels(nodes, level):
     For cutting the nav_extender levels if you have a from_level in the navigation.
     """
     result = []
-    if nodes:
-        if nodes[0].level == level:
-            return nodes
+    if nodes and nodes[0].level == level:
+        return nodes
     for node in nodes:
         result += cut_levels(node.children, level)
     return result

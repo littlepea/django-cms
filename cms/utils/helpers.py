@@ -13,21 +13,21 @@ def reversion_register(model_class, fields=None, follow=(), format="json", exclu
     """
     
     # reversion's merely recommended, not required
-    if not 'reversion' in settings.INSTALLED_APPS:
+    if 'reversion' not in settings.INSTALLED_APPS:
         return
-    
+
     from reversion.models import VERSION_CHANGE
     if fields and exclude_fields:
         raise ValueError("Just one of fields, exclude_fields arguments can be passed.")
-    
+
     opts = model_class._meta
     local_fields = opts.local_fields + opts.local_many_to_many
     if fields is None:
         fields = [field.name for field in local_fields]
-    
+
     exclude_fields = exclude_fields or []
-    
-    fields = filter(lambda name: not name in exclude_fields, fields)        
+
+    fields = filter(lambda name: name not in exclude_fields, fields)        
 
     from cms.utils import reversion_hacks
     reversion_hacks.register_draft_only(model_class, fields, follow, format)

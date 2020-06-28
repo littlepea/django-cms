@@ -228,12 +228,12 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
     def test_same_order(self):
         # create 4 pages
         slugs = []
-        for i in range(0, 4):
+        for _ in range(4):
             page = create_page("page", "nav_playground.html", "en",
                                parent=self.home_page)
             slug = page.title_set.drafts()[0].slug
             slugs.append(slug)
-        
+
         # approve last 2 pages in reverse order
         for slug in reversed(slugs[2:]):
             page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=slug)

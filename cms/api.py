@@ -123,7 +123,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         created_by = created_by.username
     else:
         _thread_locals.user = None
-    
+
     # validate template
     assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
 
@@ -135,17 +135,13 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate language:
     assert language in get_language_list(site), get_cms_setting('LANGUAGES').get(site.pk)
-    
+
     # set default slug:
     if not slug:
         slug = _generate_valid_slug(title, parent, language)
-    
-    # validate and normalize apphook 
-    if apphook:
-        application_urls = _verify_apphook(apphook)
-    else:
-        application_urls = None
-    
+
+    # validate and normalize apphook
+    application_urls = _verify_apphook(apphook) if apphook else None
     # validate parent
     if parent:
         assert isinstance(parent, Page)
@@ -154,26 +150,26 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # validate publication date
     if publication_date:
         assert isinstance(publication_date, datetime.date)
-    
+
     # validate publication end date
     if publication_end_date:
         assert isinstance(publication_end_date, datetime.date)
-        
+
     # validate softroot
     assert get_cms_setting('SOFTROOT') or not soft_root
-    
+
     if navigation_extenders:
         raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)
         menus = [menu[0] for menu in raw_menus]
         assert navigation_extenders in menus
-        
+
     # validate menu visibility
     accepted_limitations = (VISIBILITY_ALL, VISIBILITY_USERS, VISIBILITY_STAFF)
     assert limit_visibility_in_menu in accepted_limitations
-    
+
     # validate position
     assert position in ('last-child', 'first-child', 'left', 'right')
-    
+
     page = Page(
         created_by=created_by,
         changed_by=created_by,
@@ -231,13 +227,9 @@ def create_title(language, title, page, menu_title=None, slug=None,
     # set default slug:
     if not slug:
         slug = _generate_valid_slug(title, parent, language)
-        
-    # validate and normalize apphook 
-    if apphook:
-        application_urls = _verify_apphook(apphook)
-    else:
-        application_urls = None
-    
+
+    # validate and normalize apphook
+    application_urls = _verify_apphook(apphook) if apphook else None
     title = Title.objects.create(
         language=language,
         title=title,

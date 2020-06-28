@@ -70,7 +70,7 @@ class Placeholder(models.Model):
 
     def render(self, context, width):
         from cms.plugin_rendering import render_placeholder
-        if not 'request' in context:
+        if 'request' not in context:
             return '<!-- missing request -->'
         width = width or self.default_width
         if width:

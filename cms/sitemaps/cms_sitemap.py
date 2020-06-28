@@ -6,8 +6,7 @@ def from_iterable(iterables):
     Backport of itertools.chain.from_iterable
     """
     for it in iterables:
-        for element in it:
-            yield element
+        yield from it
 
 class CMSSitemap(Sitemap):
     changefreq = "monthly"
@@ -16,8 +15,7 @@ class CMSSitemap(Sitemap):
     def items(self):
         from cms.utils.page_resolver import get_page_queryset
         page_queryset = get_page_queryset(None)
-        all_pages = page_queryset.published().filter(login_required=False)
-        return all_pages
+        return page_queryset.published().filter(login_required=False)
 
     def lastmod(self, page):
         modification_dates = [page.changed_date, page.publication_date]

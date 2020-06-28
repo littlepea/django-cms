@@ -191,22 +191,14 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         request = self.get_request(user, page)
         nodes = menu_pool.get_nodes(request)
         target_url = page.get_absolute_url()
-        found_in_menu = False
-        for node in nodes:
-            if node.get_absolute_url() == target_url:
-                found_in_menu = True
-                break
+        found_in_menu = any(node.get_absolute_url() == target_url for node in nodes)
         self.assertTrue(found_in_menu)
 
     def assertNotInMenu(self, page, user):
         request = self.get_request(user, page)
         nodes = menu_pool.get_nodes(request)
         target_url = page.get_absolute_url()
-        found_in_menu = False
-        for node in nodes:
-            if node.get_absolute_url() == target_url:
-                found_in_menu = True
-                break
+        found_in_menu = any(node.get_absolute_url() == target_url for node in nodes)
         self.assertFalse(found_in_menu)
 
     def assertNodeMemberships(self, visible_page_ids, restricted_pages, public_page_ids):
@@ -259,7 +251,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         return type('Request', (object,), attrs)
 
     def get_url_dict(self, pages, language='en'):
-        return dict((page.get_absolute_url(language=language), page) for page in pages)
+        return {page.get_absolute_url(language=language): page for page in pages}
 
 
 class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):

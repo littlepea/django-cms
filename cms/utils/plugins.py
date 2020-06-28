@@ -26,7 +26,7 @@ def _extend_blocks(extend_node, blocks):
     parent = extend_node.get_parent(None)
     # Search for new blocks
     for node in parent.nodelist.get_nodes_by_type(BlockNode):
-        if not node.name in blocks:
+        if node.name not in blocks:
             blocks[node.name] = node
         else:
             # set this node as the super node (for {{ block.super }})

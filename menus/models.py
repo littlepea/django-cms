@@ -5,7 +5,7 @@ from django.db import models
 class CacheKeyManager(models.Manager):
     def get_keys(self, site_id=None, language=None):
         ret = self.none()
-        if not site_id and not language:
+        if not (site_id or language):
             # Both site and language are None - return everything  
             ret = self.all()
         elif not site_id:

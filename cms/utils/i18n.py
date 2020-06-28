@@ -72,20 +72,17 @@ def get_language_list(site_id=None):
     """
     :return: returns a list of iso2codes for this site
     """
-    languages = []
-    for language in get_languages(site_id):
-        languages.append(language['code'])
-    return languages
+    return [language['code'] for language in get_languages(site_id)]
 
 
 def get_language_tuple(site_id=None):
     """
     :return: returns an list of tuples like the old CMS_LANGUAGES or the LANGUAGES for this site
     """
-    languages = []
-    for language in get_languages(site_id):
-        languages.append((language['code'], language['name']))
-    return languages
+    return [
+        (language['code'], language['name'])
+        for language in get_languages(site_id)
+    ]
 
 
 def get_language_dict(site_id=None):
@@ -102,11 +99,11 @@ def get_public_languages(site_id=None):
     """
     :return: list of iso2codes of public languages for this site
     """
-    languages = []
-    for language in get_language_objects(site_id):
-        if language.get("public", True):
-            languages.append(language['code'])
-    return languages
+    return [
+        language['code']
+        for language in get_language_objects(site_id)
+        if language.get("public", True)
+    ]
 
 
 def get_language_object(language_code, site_id=None):
@@ -147,7 +144,7 @@ def get_default_language(language_code=None, site_id=None):
     # otherwise split the language code if possible, so iso3
     language_code = language_code.split("-")[0]
 
-    if not language_code in languages:
+    if language_code not in languages:
         return settings.LANGUAGE_CODE
 
     return language_code

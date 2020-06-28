@@ -872,7 +872,7 @@ class NoAdminPageTests(CMSTestCase):
 
     def setUp(self):
         admin = 'django.contrib.admin'
-        noadmin_apps = [app for app in settings.INSTALLED_APPS if not app == admin]
+        noadmin_apps = [app for app in settings.INSTALLED_APPS if app != admin]
         self._ctx = SettingsOverride(INSTALLED_APPS=noadmin_apps)
         self._ctx.__enter__()
 

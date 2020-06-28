@@ -36,9 +36,7 @@ def is_valid_page_slug(page, parent, lang, slug, site, path=None):
     if qs.filter(slug=slug).count():
         return False
         ## Check for path
-    if path and qs.filter(path=path).count():
-        return False
-    return True
+    return not path or not qs.filter(path=path).count()
 
 
 def get_available_slug(title, new_slug=None):

@@ -258,7 +258,7 @@ class CMSMenu(Menu):
                 home_cut = True
             if (page.parent_id == home.pk or page.parent_id in home_children) and home_cut:
                 home_children.append(page.pk)
-            if (page.pk == home.pk and home.in_navigation) or page.pk != home.pk:
+            if home.in_navigation or page.pk != home.pk:
                 first = False
             ids[page.id] = page
             actual_pages.append(page)

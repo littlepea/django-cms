@@ -141,7 +141,9 @@ def get_page_from_request(request, use_path=None):
             admin_base = reverse('admin:index')
         else:
             admin_base = None
-        if path.startswith(pages_root) and (not admin_base or not path.startswith(admin_base)):
+        if path.startswith(pages_root) and not (
+            admin_base and path.startswith(admin_base)
+        ):
             path = path[len(pages_root):]
         # and strip any final slash
         if path.endswith("/"):
@@ -172,12 +174,12 @@ def is_valid_url(url, instance, create_links=True, site=None):
         if url.startswith(page_root):
             url = url[len(page_root):]
         page_qs = get_page_queryset_from_path(url.strip('/'), site=site)
-        url_clashes = []
         # If queryset has pages checks for conflicting urls
         if page_qs is not None:
             # If single page is returned create a list for interface compat
             if isinstance(page_qs, Page):
                 page_qs = [page_qs]
+            url_clashes = []
             for page in page_qs:
                 # Every page in the queryset except the current one is a conflicting page
                 # We have to exclude both copies of the page

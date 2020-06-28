@@ -10,10 +10,7 @@ urlpatterns = []
 def configure(db_url, **extra):
     from django.conf import settings
     os.environ['DJANGO_SETTINGS_MODULE'] = 'cms.test_utils.cli'
-    if not 'DATABASES' in extra:
-        DB = dj_database_url.parse(db_url)
-    else:
-        DB = {}
+    DB = dj_database_url.parse(db_url) if 'DATABASES' not in extra else {}
     defaults = dict(
         CACHE_BACKEND='locmem:///',
         DEBUG=True,

@@ -11,14 +11,16 @@ from django.shortcuts import render_to_response, get_object_or_404
 def get_copy_dialog(request, page_id):
     if not get_cms_setting('PERMISSION'):
         return HttpResponse('')
-     
+
     page = get_object_or_404(Page, pk=page_id)
     target = get_object_or_404(Page, pk=request.REQUEST['target'])
-    
-    if not page.has_change_permission(request) or \
-            not target.has_add_permission(request):
+
+    if not (
+        page.has_change_permission(request)
+        and target.has_add_permission(request)
+    ):
         raise Http404 
-    
+
     context = {
         'dialog_id': 'dialog-copy',
         'form': PermissionForm(), # class needs to be instantiated

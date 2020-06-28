@@ -143,19 +143,19 @@ def _get_old_language_conf(code, name, template):
     language['code'] = code
     language['name'] = name
     default_fallbacks = dict(settings.CMS_LANGUAGES).keys()
-    if hasattr(settings, 'CMS_LANGUAGE_FALLBACK'):
-        if settings.CMS_LANGUAGE_FALLBACK:
-            if hasattr(settings, 'CMS_LANGUAGE_CONF'):
-                language['fallbacks'] = settings.CMS_LANGUAGE_CONF.get(code, default_fallbacks)
-            else:
-                language['fallbacks'] = default_fallbacks
-        else:
-            language['fallbacks'] = []
+    if (
+        settings.CMS_LANGUAGE_FALLBACK
+        and hasattr(settings, 'CMS_LANGUAGE_CONF')
+        or not hasattr(settings, 'CMS_LANGUAGE_FALLBACK')
+        and hasattr(settings, 'CMS_LANGUAGE_CONF')
+    ):
+        language['fallbacks'] = settings.CMS_LANGUAGE_CONF.get(code, default_fallbacks)
+    elif settings.CMS_LANGUAGE_FALLBACK or not hasattr(
+        settings, 'CMS_LANGUAGE_FALLBACK'
+    ):
+        language['fallbacks'] = default_fallbacks
     else:
-        if hasattr(settings, 'CMS_LANGUAGE_CONF'):
-            language['fallbacks'] = settings.CMS_LANGUAGE_CONF.get(code, default_fallbacks)
-        else:
-            language['fallbacks'] = default_fallbacks
+        language['fallbacks'] = []
     if hasattr(settings, 'CMS_FRONTEND_LANGUAGES'):
         language['public'] = code in settings.CMS_FRONTEND_LANGUAGES
     return language

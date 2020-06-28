@@ -36,10 +36,9 @@ class Switcher(BaseItem):
         self.session_key = session_key
         
     def get_state(self, request):
-        state = self.add_parameter in request.GET
         if self.session_key and request.session.get(self.session_key, False):
             return True
-        return state
+        return self.add_parameter in request.GET
         
         
     def get_extra_data(self, context, toolbar, **kwargs):

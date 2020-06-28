@@ -21,10 +21,7 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
     page_only = True
     
     def render(self, context, instance, placeholder):
-        template_vars = {
-            'placeholder': placeholder,
-        }
-        template_vars['object'] = instance
+        template_vars = {'placeholder': placeholder, 'object': instance}
         lang = instance.from_language
         request = context.get('request', None)
         if not lang:
@@ -47,7 +44,7 @@ class InheritPagePlaceholderPlugin(CMSPluginBase):
             parent__isnull=True
         ).order_by('position').select_related()
         plugin_output = []
-        template_vars['parent_plugins'] = plugins 
+        template_vars['parent_plugins'] = plugins
         for plg in plugins:
             tmpctx = copy.copy(context)
             tmpctx.update(template_vars)

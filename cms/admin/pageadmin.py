@@ -240,10 +240,7 @@ class PageAdmin(ModelAdmin):
 
         if 'recover' in request.path:
             pk = obj.pk
-            if obj.parent_id:
-                parent = Page.objects.get(pk=obj.parent_id)
-            else:
-                parent = None
+            parent = Page.objects.get(pk=obj.parent_id) if obj.parent_id else None
             obj.lft = 0
             obj.rght = 0
             obj.tree_id = 0
@@ -326,7 +323,9 @@ class PageAdmin(ModelAdmin):
 
         if obj:
             self.inlines = PAGE_ADMIN_INLINES
-            if not obj.has_publish_permission(request) and not 'published' in self.exclude:
+            if not (
+                obj.has_publish_permission(request) or 'published' in self.exclude
+            ):
                 self.exclude.append('published')
             elif 'published' in self.exclude:
                 self.exclude.remove('published')
@@ -391,18 +390,24 @@ class PageAdmin(ModelAdmin):
                             revs.append(rev)
                     for rev in revs:
                         pobj = rev.object
-                        if pobj.__class__ == Placeholder:
-                            if pobj.slot == placeholder_name:
-                                placeholder = pobj
-                                break
+                        if (
+                            pobj.__class__ == Placeholder
+                            and pobj.slot == placeholder_name
+                        ):
+                            placeholder = pobj
+                            break
                     for rev in revs:
                         pobj = rev.object
-                        if pobj.__class__ == CMSPlugin:
-                            if pobj.language == language and pobj.placeholder_id == placeholder.id and not pobj.parent_id:
-                                if pobj.get_plugin_class() == CMSPlugin:
-                                    plugin_list.append(pobj)
-                                else:
-                                    bases[int(pobj.pk)] = pobj
+                        if (
+                            pobj.__class__ == CMSPlugin
+                            and pobj.language == language
+                            and pobj.placeholder_id == placeholder.id
+                            and not pobj.parent_id
+                        ):
+                            if pobj.get_plugin_class() == CMSPlugin:
+                                plugin_list.append(pobj)
+                            else:
+                                bases[int(pobj.pk)] = pobj
                         if hasattr(pobj, "cmsplugin_ptr_id"):
                             actual_plugins.append(pobj)
                     for plugin in actual_plugins:
@@ -419,7 +424,10 @@ class PageAdmin(ModelAdmin):
                         language=language)
                     dict_cms_languages = get_language_dict()
                     for plugin in other_plugins:
-                        if (not plugin.language in copy_languages) and (plugin.language in dict_cms_languages):
+                        if (
+                            plugin.language not in copy_languages
+                            and plugin.language in dict_cms_languages
+                        ):
                             copy_languages[plugin.language] = dict_cms_languages[plugin.language]
 
                 language = get_language_from_request(request, obj)
@@ -616,7 +624,7 @@ class PageAdmin(ModelAdmin):
         """
         Returns True if the use has the right to recover pages
         """
-        if not "reversion" in settings.INSTALLED_APPS:
+        if "reversion" not in settings.INSTALLED_APPS:
             return False
         user = request.user
         if user.is_superuser:
@@ -709,8 +717,9 @@ class PageAdmin(ModelAdmin):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
             raise PermissionDenied
         extra_context = self.update_language_tab_context(request, None, extra_context)
-        response = super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
-        return response
+        return super(PageAdmin, self).revision_view(
+            request, object_id, version_id, extra_context
+        )
 
     def history_view(self, request, object_id, extra_context=None):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
@@ -770,8 +779,10 @@ class PageAdmin(ModelAdmin):
             return jsonify_request(HttpResponseBadRequest("error"))
 
         # does he haves permissions to do this...?
-        if not page.has_move_page_permission(request) or \
-                not target.has_add_permission(request):
+        if not (
+            page.has_move_page_permission(request)
+            and target.has_add_permission(request)
+        ):
             return jsonify_request(
                 HttpResponseForbidden(_("Error! You don't have permissions to move this page. Please reload the page")))
         # move page
@@ -884,12 +895,12 @@ class PageAdmin(ModelAdmin):
                 deleted = []
                 for version in versions_qs.filter(revision__comment__exact=PUBLISH_COMMENT).order_by(
                         '-revision__pk')[limit - 1:]:
-                    if not version.revision_id in deleted:
+                    if version.revision_id not in deleted:
                         revision = version.revision
                         revision.delete()
                         deleted.append(revision.pk)
             helpers.make_revision_with_plugins(page, request.user, PUBLISH_COMMENT)
-            # create a new publish reversion
+                # create a new publish reversion
         if 'node' in request.REQUEST:
             # if request comes from tree..
             return admin_utils.render_admin_menu_item(request, page)
@@ -1039,7 +1050,7 @@ class PageAdmin(ModelAdmin):
         url = page.get_absolute_url(language) + attrs
         site = current_site(request)
 
-        if not site == page.site:
+        if site != page.site:
             url = "http%s://%s%s" % ('s' if request.is_secure() else '',
             page.site.domain, url)
         return HttpResponseRedirect(url)
@@ -1176,7 +1187,7 @@ class PageAdmin(ModelAdmin):
 
         if not page.has_change_permission(request):
             return HttpResponseForbidden(_("You do not have permission to change this page"))
-        if not language or not language in get_language_list():
+        if not language or language not in get_language_list():
             return HttpResponseBadRequest(_("Language must be set to a supported language!"))
         if language == copy_from:
             return HttpResponseBadRequest(_("Language must be different than the copied language!"))
@@ -1203,7 +1214,7 @@ class PageAdmin(ModelAdmin):
     @create_revision()
     def edit_plugin(self, request, plugin_id):
         plugin_id = int(plugin_id)
-        if not 'history' in request.path and not 'recover' in request.path:
+        if not ('history' in request.path or 'recover' in request.path):
             cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
             page = cms_plugin.placeholder.page if cms_plugin.placeholder else None
             instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
@@ -1285,16 +1296,16 @@ class PageAdmin(ModelAdmin):
                 })
             return render_to_response('admin/cms/page/plugin_forms_ok.html', context, RequestContext(request))
 
-        if not instance:
-            # instance doesn't exist, call add view
-            response = plugin_admin.add_view(request)
-
-        else:
+        if instance:
             # already saved before, call change view
             # we actually have the instance here, but since i won't override
             # change_view method, is better if it will be loaded again, so
             # just pass id to plugin_admin
             response = plugin_admin.change_view(request, str(plugin_id))
+        else:
+            # instance doesn't exist, call add view
+            response = plugin_admin.add_view(request)
+
         if request.method == "POST" and plugin_admin.object_successfully_changed:
             moderator.page_changed(page,
                                    force_moderation_action=PageModeratorState.ACTION_CHANGED)

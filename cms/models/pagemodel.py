@@ -271,10 +271,7 @@ class Page(MPTTModel):
                 page.reverse_id = None
             if first:
                 first = False
-                if tree:
-                    page.parent = tree[0]
-                else:
-                    page.parent = None
+                page.parent = tree[0] if tree else None
                 page.insert_at(target, position)
             else:
                 count = 1
@@ -353,15 +350,12 @@ class Page(MPTTModel):
         from cms.utils.permissions import _thread_locals
 
         user = getattr(_thread_locals, "user", None)
-        if user:
-            self.changed_by = user.username
-        else:
-            self.changed_by = "script"
+        self.changed_by = user.username if user else "script"
         if created:
             self.created_by = self.changed_by
 
-        if commit:
-            if no_signals:  # ugly hack because of mptt
+        if commit:  # ugly hack because of mptt
+            if no_signals:
                 self.save_base(cls=self.__class__, **kwargs)
             else:
                 super(Page, self).save(**kwargs)
@@ -381,8 +375,7 @@ class Page(MPTTModel):
         if keep_state:
             delattr(self, '_publisher_keep_state')
 
-        ret = super(Page, self).save_base(*args, **kwargs)
-        return ret
+        return super(Page, self).save_base(*args, **kwargs)
 
     def publish(self):
         """Overrides Publisher method, because there may be some descendants, which
@@ -577,7 +570,7 @@ class Page(MPTTModel):
         for page in descendants:
             placeholders = list(page.placeholders.all())
             if page.publisher_public_id:
-                placeholders = placeholders + list(page.publisher_public.placeholders.all())
+                placeholders += list(page.publisher_public.placeholders.all())
 
             plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
             plugins.delete()
@@ -639,9 +632,8 @@ class Page(MPTTModel):
         """Helper function for getting attribute or None from wanted/current title.
         """
         try:
-            attribute = getattr(self.get_title_obj(
+            return getattr(self.get_title_obj(
                 language, fallback, version_id, force_reload), attrname)
-            return attribute
         except AttributeError:
             return None
 
@@ -712,7 +704,7 @@ class Page(MPTTModel):
         if not hasattr(self, "title_cache") or force_reload:
             load = True
             self.title_cache = {}
-        elif not language in self.title_cache:
+        elif language not in self.title_cache:
             if fallback:
                 fallback_langs = i18n.get_fallback_languages(language)
                 for lang in fallback_langs:
@@ -870,8 +862,11 @@ class Page(MPTTModel):
         Return the string 'All' if the user has all rights.
         """
         att_name = "permission_%s_cache" % perm_type
-        if not hasattr(self, "permission_user_cache") or not hasattr(self, att_name) \
-            or request.user.pk != self.permission_user_cache.pk:
+        if not (
+            hasattr(self, "permission_user_cache")
+            and hasattr(self, att_name)
+            and request.user.pk == self.permission_user_cache.pk
+        ):
             from cms.utils.permissions import has_generic_permission
 
             self.permission_user_cache = request.user
@@ -939,10 +934,9 @@ class Page(MPTTModel):
         result = getattr(self, '_moderator_state_cache', None)
         if result is None:
             return self.pagemoderatorstate_set.get_delete_actions().exists()
-        for state in result:
-            if state.action == PageModeratorState.ACTION_DELETE:
-                return True
-        return False
+        return any(
+            state.action == PageModeratorState.ACTION_DELETE for state in result
+        )
 
     def is_public_published(self):
         """Returns true if public model is published.
@@ -1100,7 +1094,7 @@ class Page(MPTTModel):
             if placeholder.slot in placeholders:
                 found[placeholder.slot] = placeholder
         for placeholder_name in placeholders:
-            if not placeholder_name in found:
+            if placeholder_name not in found:
                 placeholder = Placeholder.objects.create(slot=placeholder_name)
                 self.placeholders.add(placeholder)
                 found[placeholder_name] = placeholder

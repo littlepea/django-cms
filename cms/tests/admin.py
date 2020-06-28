@@ -849,8 +849,7 @@ class PluginPermissionTests(AdminTestsBase):
             user.save()
 
     def _create_plugin(self):
-        plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
-        return plugin
+        return add_plugin(self._placeholder, 'TextPlugin', 'en')
 
     def test_plugin_add_requires_permissions(self):
         """User tries to add a plugin but has no permissions. He can add the plugin after he got the permissions"""
@@ -1092,7 +1091,6 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
         with SettingsOverride(CMS_PERMISSION=True):
             admin = self.get_superuser()
             PAGE_NAME = 'TestPage'
-            USER_NAME = 'test_size_user_0'
             site = Site.objects.get(pk=1)
             page = create_page(PAGE_NAME, "nav_playground.html", "en", site=site, created_by=admin)
             page.save()
@@ -1103,6 +1101,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 self.assertEqual(response.status_code, 200)
                 old_response_size = len(response.content)
                 old_user_count = User.objects.count()
+                USER_NAME = 'test_size_user_0'
                 # create additionals user and reload the page
                 User.objects.create(username=USER_NAME, is_active=True)
                 user_count = User.objects.count()

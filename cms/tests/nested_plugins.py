@@ -456,7 +456,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             msg = u"parent plugin right is not updated, child not inserted correctly"
             self.assertTrue(text_plugin.rght > link_plugin.rght, msg=msg)
             msg = u"link has no parent"
-            self.assertFalse(link_plugin.parent == None, msg=msg)
+            self.assertFalse(link_plugin.parent is None, msg=msg)
             msg = u"parent plugin left is not updated, child not inserted correctly"
             self.assertTrue(text_plugin.lft < link_plugin.lft, msg=msg)
             msg = u"child level is not bigger than parent level"

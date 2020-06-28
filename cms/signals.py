@@ -88,7 +88,10 @@ def post_save_title(instance, raw, created, **kwargs):
     # Update descendants only if path changed
     application_changed = False
     prevent_descendants = hasattr(instance, 'tmp_prevent_descendant_update')
-    if instance.path != getattr(instance, 'tmp_path', None) and not prevent_descendants:
+    if not (
+        instance.path == getattr(instance, 'tmp_path', None)
+        or prevent_descendants
+    ):
         descendant_titles = Title.objects.filter(
             page__lft__gt=instance.page.lft,
             page__rght__lt=instance.page.rght,
